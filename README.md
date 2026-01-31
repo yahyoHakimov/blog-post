@@ -37,7 +37,7 @@ A full-stack blog application with REST API backend (FastAPI + PostgreSQL) and v
 
 ### 1. Clone Repository
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/yahyoHakimov/blog-post
 cd blog-api
 ```
 
