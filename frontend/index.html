@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Blog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+        }
+
+        .create-section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .btn-edit {
+            background: #28a745;
+            padding: 6px 12px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .btn-edit:hover {
+            background: #218838;
+        }
+
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+        }
+
+        .filters input {
+            flex: 1;
+        }
+
+        .articles-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .article-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .article-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .article-title {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .article-meta {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .article-content {
+            color: #444;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            background: #e9ecef;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #495057;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Personal Blog</h1>
+            <p class="subtitle">Share your thoughts with the world</p>
+        </header>
+
+        <div class="create-section">
+            <h2 id="form-title">Create New Article</h2>
+            <div id="message"></div>
+            
+            <form id="article-form">
+                <input type="hidden" id="article-id">
+                
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Author</label>
+                    <input type="text" id="author" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="content">Content</label>
+                    <textarea id="content" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="tags">Tags (comma separated)</label>
+                    <input type="text" id="tags" placeholder="python, fastapi, tutorial">
+                </div>
+
+                <button type="submit" id="submit-btn">Publish Article</button>
+                <button type="button" id="cancel-btn" class="hidden" onclick="cancelEdit()">Cancel</button>
+            </form>
+        </div>
+
+        <div class="filters">
+            <input type="text" id="filter-author" placeholder="Filter by author">
+            <input type="text" id="filter-tag" placeholder="Filter by tag">
+            <button onclick="loadArticles()">Apply Filters</button>
+        </div>
+
+        <div class="articles-list" id="articles-list"></div>
+    </div>
+
+    <script>
+        const API_URL = '';
+
+        // Articles yuklash
+        async function loadArticles() {
+            const author = document.getElementById('filter-author').value;
+            const tag = document.getElementById('filter-tag').value;
+            
+            let url = `${API_URL}/articles?`;
+            if (author) url += `author=${encodeURIComponent(author)}&`;
+            if (tag) url += `tag=${encodeURIComponent(tag)}&`;
+
+            try {
+                const response = await fetch(url);
+                const articles = await response.json();
+                displayArticles(articles);
+            } catch (error) {
+                showMessage('Failed to load articles', 'error');
+            }
+        }
+
+        // Articles ko'rsatish
+        function displayArticles(articles) {
+            const container = document.getElementById('articles-list');
+            
+            if (articles.length === 0) {
+                container.innerHTML = '<div class="article-card"><p>No articles found</p></div>';
+                return;
+            }
+
+            container.innerHTML = articles.map(article => `
+                <div class="article-card">
+                    <div class="article-header">
+                        <div>
+                            <h2 class="article-title">${article.title}</h2>
+                            <div class="article-meta">
+                                By ${article.author} • ${new Date(article.created_at).toLocaleDateString()}
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-edit" onclick="editArticle(${article.id})">Edit</button>
+                            <button class="btn-delete" onclick="deleteArticle(${article.id})">Delete</button>
+                        </div>
+                    </div>
+                    <div class="article-content">${article.content}</div>
+                    <div class="tags">
+                        ${article.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Article yaratish/yangilash
+        document.getElementById('article-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const id = document.getElementById('article-id').value;
+            const title = document.getElementById('title').value;
+            const author = document.getElementById('author').value;
+            const content = document.getElementById('content').value;
+            const tagsInput = document.getElementById('tags').value;
+            const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()) : [];
+
+            const articleData = { title, author, content, tags };
+
+            try {
+                let response;
+                if (id) {
+                    // Update
+                    response = await fetch(`${API_URL}/articles/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(articleData)
+                    });
+                } else {
+                    // Create
+                    response = await fetch(`${API_URL}/articles`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(articleData)
+                    });
+                }
+
+                if (response.ok) {
+                    showMessage(id ? 'Article updated!' : 'Article published!', 'success');
+                    resetForm();
+                    loadArticles();
+                } else {
+                    showMessage('Failed to save article', 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        });
+
+        // Article o'chirish
+        async function deleteArticle(id) {
+            if (!confirm('Are you sure you want to delete this article?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/articles/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showMessage('Article deleted!', 'success');
+                    loadArticles();
+                } else {
+                    showMessage('Failed to delete article', 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        }
+
+        // Article edit qilish
+        async function editArticle(id) {
+            try {
+                const response = await fetch(`${API_URL}/articles/${id}`);
+                const article = await response.json();
+
+                document.getElementById('article-id').value = article.id;
+                document.getElementById('title').value = article.title;
+                document.getElementById('author').value = article.author;
+                document.getElementById('content').value = article.content;
+                document.getElementById('tags').value = article.tags.join(', ');
+
+                document.getElementById('form-title').textContent = 'Edit Article';
+                document.getElementById('submit-btn').textContent = 'Update Article';
+                document.getElementById('cancel-btn').classList.remove('hidden');
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (error) {
+                showMessage('Failed to load article', 'error');
+            }
+        }
+
+        // Edit bekor qilish
+        function cancelEdit() {
+            resetForm();
+        }
+
+        // Formni reset qilish
+        function resetForm() {
+            document.getElementById('article-form').reset();
+            document.getElementById('article-id').value = '';
+            document.getElementById('form-title').textContent = 'Create New Article';
+            document.getElementById('submit-btn').textContent = 'Publish Article';
+            document.getElementById('cancel-btn').classList.add('hidden');
+        }
+
+        // Xabar ko'rsatish
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = type;
+            messageDiv.textContent = text;
+            setTimeout(() => {
+                messageDiv.className = '';
+                messageDiv.textContent = '';
+            }, 3000);
+        }
+
+        // Sahifa yuklanganda articlelarni olish
+        loadArticles();
+    </script>
+</body>
+</html>
